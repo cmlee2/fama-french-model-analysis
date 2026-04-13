@@ -21,12 +21,12 @@ def get_fama_factors(model_type = '3-Factor'):
         return None
 
 
-def get_ticker_data(stock_ticker):
+def get_ticker_data(stock_ticker, start_date):
     """Fetch historical stock pric and calculate daily returns, default is 5 years"""
 
     try:
         stock = yf.Ticker(ticker=stock_ticker)
-        history = stock.history(period = '5y')
+        history = stock.history(start = start_date)
 
         if history.empty:
             return None
@@ -38,12 +38,13 @@ def get_ticker_data(stock_ticker):
         history['Previous Close'] = history['Close'].shift(1)
         history['Percentage Change'] = ((history['Close'] - history['Previous Close']) / history['Previous Close']) * 100
 
+        # Using .get in case info is not there, usually due to ETFs
         ticker_info = {
-            'Ticker' : stock_ticker.info['symbol'],
-            'Name' : stock_ticker.info['shortName'],
-            'Industry' : stock_ticker.info['industry'],
-            'Summary' : stock_ticker.info['longBusinessSummary'],
-            'DataFrame' : history[['Date', 'Percentage Change']]
+            'Ticker' : stock.info.get('symbol', stock_ticker),
+            'Name' : stock.info.get('shortName', 'N/A'),
+            'Industry' : stock.info.get('industry', 'N/A'),
+            'Summary' : stock.info.get('longBusinessSummary', 'N/A'),
+            'DataFrame' : history[['Date', 'Percentage Change']].dropna()
         }
 
         return ticker_info
@@ -61,13 +62,19 @@ def load_combine(stock_ticker, model_type = '3-Factor'):
     if factors is None:
         return None
     
-    stock_data = get_ticker_data(stock_ticker=stock_ticker)
-    stock_df = stock_data['DataFrame']
+    
+    stock_data = get_ticker_data(stock_ticker=stock_ticker, start_date=factors['Date'].min())
 
     if stock_data is None:
         st.error(f"Could not find data for ticker: {stock_ticker}")
         return None
     
+    stock_df = stock_data['DataFrame']
+
+    if stock_df is None:
+        st.error(f"Could not find data for ticker: {stock_ticker}")
+        return None
+
     # Subtract Return from Risk Free Rate
     combined = factors.merge(stock_df, on='Date', how='inner')
     combined['Excess Return'] = combined['Percentage Change'] - combined['RF']
@@ -75,3 +82,18 @@ def load_combine(stock_ticker, model_type = '3-Factor'):
 
     # Return updated dictionary
     return stock_data
+
+# Test Boilerplage
+if __name__ == "__main__":
+    # This only runs if you execute THIS file directly
+    print("--- Testing Data Loader ---")
+    test_ticker = "NVDA"
+    test_return = load_combine(test_ticker, model_type='3-Factor')
+
+    stock_df = test_return['DataFrame']
+    
+    if stock_df is not None:
+        print(f"Successfully fetched {len(stock_df)} days of data for {test_ticker}.")
+        print(stock_df.head())
+    else:
+        print("Test Failed.")
