@@ -45,7 +45,7 @@ def get_ticker_data(stock_ticker, start_date):
             'Name' : stock.info.get('shortName', 'N/A'),
             'Industry' : stock.info.get('industry', 'N/A'),
             'Summary' : stock.info.get('longBusinessSummary', 'N/A'),
-            'DataFrame' : history[['Date', 'Percentage Change']].dropna()
+            'DataFrame' : history[['Date', 'Percentage Change', 'Close']].dropna()
         }
 
         return ticker_info

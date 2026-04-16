@@ -4,7 +4,7 @@ import analysis
 import plotly.graph_objects as go
 import pandas as pd
 
-# 1. Page Configuration for a Professional Portfolio Look
+# Page Configuration
 st.set_page_config(page_title="Fama-French Factor Analyzer", layout="wide")
 
 st.title("Fama-French Factor Analysis")
@@ -13,7 +13,7 @@ st.markdown("""
 **Risk Warning:** These metrics characterize historical behavior and are NOT predictive buy signals.
 """)
 
-# 2. Sidebar Controls
+# 2. Sidebar 
 st.sidebar.header("Analysis Settings")
 ticker = st.sidebar.text_input("Enter Ticker (e.g., NVDA, AAPL, SPY)", value="NVDA").upper()
 model_choice = st.sidebar.radio("Select Model", ["3-Factor", "5-Factor"])
@@ -26,23 +26,25 @@ with st.spinner(f"Running {model_choice} Regression for {ticker}..."):
         df = data_dict['DataFrame']
         metrics, stability_df = analysis.run_fama_french_analysis(df, model_type=model_choice)
 
-        # --- Performance Visualization ---
+
         st.subheader(f"{data_dict['Name']} vs. Market Proxy")
         
-        # Calculate Cumulative Returns for a clearer 'growth' comparison
-        df['Stock_Cum'] = (1 + df['Percentage Change'] / 100).cumprod()
-        df['Mkt_Cum'] = (1 + (df['Mkt-RF'] + df['RF']) / 100).cumprod()
+        # Comparison between RF, Market and Stock
+        df['Bonds_Growth'] = (1 + df['RF']/100).cumprod()
+        df['Market_Growth'] = (1 + (df['Mkt-RF'] + df['RF'])/100).cumprod()
+        df['Stock_Growth'] = (1 + df['Percentage Change']/100).cumprod()
 
         fig = go.Figure()
-        fig.add_trace(go.Scatter(x=df['Date'], y=df['Stock_Cum'], name=ticker, line=dict(color='#00CC96', width=2)))
-        fig.add_trace(go.Scatter(x=df['Date'], y=df['Mkt_Cum'], name="Market (S&P 500)", line=dict(color='#636EFA', dash='dot')))
-        fig.update_layout(hovermode="x unified", legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1))
-        st.plotly_chart(fig, use_container_width=True)
+        fig.add_trace(go.Scatter(x=df['Date'], y=df['Stock_Growth'], name=f"{ticker} (Stock)", line=dict(color='#00CC96', width=3)))
+        fig.add_trace(go.Scatter(x=df['Date'], y=df['Market_Growth'], name="S&P 500 (Market)", line=dict(color='#636EFA', dash='dot')))
+        fig.add_trace(go.Scatter(x=df['Date'], y=df['Bonds_Growth'], name="Bonds (Cash/Risk-Free)", line=dict(color='#FECB52')))
+        
+        fig.update_layout(yaxis_title="Value of $1 Invested", hovermode="x unified")
+        st.plotly_chart(fig, width='stretch')
 
-        # --- Alpha Confidence & Factor DNA ---
+        # Alpha Confidence
         st.header("Factor Coefficeints & Statistical Significance")
         
-        # Highlight Model Confidence based on Alpha P-Value
         alpha_p = metrics['Alpha_P']
         if alpha_p < 0.05:
             st.success(f"**Significant Alpha Detected:** The model is 95% confident that this stock generated unique returns not explained by market factors ($p = {alpha_p:.4f}$).")
@@ -64,9 +66,7 @@ with st.spinner(f"Running {model_choice} Regression for {ticker}..."):
 
         # --- Academic Context & Interpretation ---
         with st.expander("How to Interpret these Values"):
-            # tab1, tab2 = st.tabs(["The Factors", "The Math"])
-            
-            # with tab1:
+
             st.write("""
             * **Alpha:** The 'Secret Sauce.' Positive alpha suggests skill or unique company value.
             * **Market Beta:** Sensitivity to the S&P 500. A beta of 1.5 means the stock moves 1.5x for every 1% market move.
@@ -75,13 +75,8 @@ with st.spinner(f"Running {model_choice} Regression for {ticker}..."):
             * **RMW (Robust Minus Weak):** Higher values mean the company has high, stable operating profitability.
             * **CMA (Conservative Minus Aggressive):** Higher values suggest the company invests conservatively in its own growth.
             """)
-            
-            # with tab2:
-            #     st.write("This tool uses the following multi-factor regression equation:")
-            #     st.latex(r"R_{i,t} - R_{f,t} = \alpha_i + \beta_1(R_{M,t} - R_{f,t}) + \beta_2(SMB_t) + \beta_3(HML_t) + \epsilon_{i,t}")
-            #     st.info("The 5-Factor model adds RMW and CMA factors to account for profitability and investment patterns.")
 
-        # --- Stability Report ---
+        # Time Series Split Results
         st.header("Time Series Split Details (4-Fold Cross-Validation)")
         st.info("I split the last 5 years into 4 chronological blocks to see if the stock's coefficients stays the same over time.")
         
@@ -92,7 +87,7 @@ with st.spinner(f"Running {model_choice} Regression for {ticker}..."):
         st.dataframe(
             stability_df.style.format(fmt), 
             use_container_width=True, 
-            hide_index=True # Removes the 0, 1, 2, 3 column
+            hide_index=True 
         )
 
     else:
