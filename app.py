@@ -27,7 +27,7 @@ with st.spinner(f"Running {model_choice} Regression for {ticker}..."):
         metrics, stability_df = analysis.run_fama_french_analysis(df, model_type=model_choice)
 
 
-        st.subheader(f"{data_dict['Name']} vs. Market Proxy")
+        st.subheader(f"Value of $1 between Bonds, {data_dict['Name']}, and S&P")
         
         # Comparison between RF, Market and Stock
         df['Bonds_Growth'] = (1 + df['RF']/100).cumprod()
