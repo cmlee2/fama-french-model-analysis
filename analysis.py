@@ -31,17 +31,29 @@ def run_fama_french_analysis(combined_df, model_type = '3-Factor'):
         y_pred = model_fold.predict(X_test)
         rmse = np.sqrt(mean_squared_error(y_test, y_pred))
         
-        stability_results.append({
+        
+        fold_data = {
             'Fold': i + 1,
             'Start_Date': combined_df.iloc[test_index]['Date'].min(),
             'End_Date': combined_df.iloc[test_index]['Date'].max(),
             'Alpha': ols_fold.params['const'],
             'Alpha_P': ols_fold.pvalues['const'],
+            'Mkt-Beta': ols_fold.params['Mkt-RF'],
+            'SMB-Beta': ols_fold.params['SMB'],
+            'HML-Beta': ols_fold.params['HML'],
             'In_Sample_R2': ols_fold.rsquared,
             'Out_Sample_R2': model_fold.score(X_test, y_test),
             'RMSE': rmse
-        })
-    
+        }
+
+        if model_type == '5-Factor':
+            fold_data['RMW-Beta'] = ols_fold.params['RMW']
+            fold_data['CMA-Beta'] = ols_fold.params['CMA']
+
+        
+        stability_results.append(fold_data)
+
+
     # Final Model (include all data)
     X_full_const = sm.add_constant(X)
     final_model = sm.OLS(y, X_full_const).fit()
