@@ -14,8 +14,16 @@ def run_fama_french_analysis(combined_df, model_type = '3-Factor'):
     X = combined_df[factors]
     y = combined_df['Excess Return']
 
-    # Time Series Split Data
-    tscv = TimeSeriesSplit(n_splits=4, test_size=252, gap=5)
+    # Logic to Fix when companies don't have enough history
+    n_samples = len(combined_df)
+    suggested_test_size = min(252, int(n_samples * 0.2))
+    
+    # Ensure we have at least enough data for 4 splits
+    if n_samples > (4 * suggested_test_size + 10):
+        tscv = TimeSeriesSplit(n_splits=4, test_size=suggested_test_size, gap=5)
+    else:
+        # Fallback for short-history stocks: fewer splits
+        tscv = TimeSeriesSplit(n_splits=2, test_size=suggested_test_size, gap=5)
     stability_results = []
     for i, (train_index, test_index) in enumerate(tscv.split(combined_df)):
 
