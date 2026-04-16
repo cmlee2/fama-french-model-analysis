@@ -1,7 +1,8 @@
-streamlit
-yfinance
-pandas_datareader
-pandas
+setuptools
+streamlit>=1.55.0
+yfinance>=0.2.50
+pandas-datareader==0.10.0
+pandas==1.5.3
 statsmodels
-scikit-learn
+scikit-learn>=1.8.0
 plotly
