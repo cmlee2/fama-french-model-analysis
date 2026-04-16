@@ -64,17 +64,17 @@ with st.spinner(f"Running {model_choice} Regression for {ticker}..."):
 
         # --- Academic Context & Interpretation ---
         with st.expander("How to Interpret these Values"):
-            tab1, tab2 = st.tabs(["The Factors", "The Math"])
+            # tab1, tab2 = st.tabs(["The Factors", "The Math"])
             
-            with tab1:
-                st.write("""
-                * **Alpha:** The 'Secret Sauce.' Positive alpha suggests skill or unique company value.
-                * **Market Beta:** Sensitivity to the S&P 500. A beta of 1.5 means the stock moves 1.5x for every 1% market move.
-                * **SMB (Small Minus Big):** Positive values move like Small-Caps; Negative values move like Blue-Chip Giants.
-                * **HML (High Minus Low):** Positive suggests a 'Value' (undervalued) profile; Negative suggests a 'Growth' profile.
-                * **RMW (Robust Minus Weak):** Higher values mean the company has high, stable operating profitability.
-                * **CMA (Conservative Minus Aggressive):** Higher values suggest the company invests conservatively in its own growth.
-                """)
+            # with tab1:
+            st.write("""
+            * **Alpha:** The 'Secret Sauce.' Positive alpha suggests skill or unique company value.
+            * **Market Beta:** Sensitivity to the S&P 500. A beta of 1.5 means the stock moves 1.5x for every 1% market move.
+            * **SMB (Small Minus Big):** Positive values move like Small-Caps; Negative values move like Blue-Chip Giants.
+            * **HML (High Minus Low):** Positive suggests a 'Value' (undervalued) profile; Negative suggests a 'Growth' profile.
+            * **RMW (Robust Minus Weak):** Higher values mean the company has high, stable operating profitability.
+            * **CMA (Conservative Minus Aggressive):** Higher values suggest the company invests conservatively in its own growth.
+            """)
             
             # with tab2:
             #     st.write("This tool uses the following multi-factor regression equation:")
