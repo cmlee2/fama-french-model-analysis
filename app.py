@@ -76,10 +76,10 @@ with st.spinner(f"Running {model_choice} Regression for {ticker}..."):
                 * **CMA (Conservative Minus Aggressive):** Higher values suggest the company invests conservatively in its own growth.
                 """)
             
-            with tab2:
-                st.write("This tool uses the following multi-factor regression equation:")
-                st.latex(r"R_{i,t} - R_{f,t} = \alpha_i + \beta_1(R_{M,t} - R_{f,t}) + \beta_2(SMB_t) + \beta_3(HML_t) + \epsilon_{i,t}")
-                st.info("The 5-Factor model adds RMW and CMA factors to account for profitability and investment patterns.")
+            # with tab2:
+            #     st.write("This tool uses the following multi-factor regression equation:")
+            #     st.latex(r"R_{i,t} - R_{f,t} = \alpha_i + \beta_1(R_{M,t} - R_{f,t}) + \beta_2(SMB_t) + \beta_3(HML_t) + \epsilon_{i,t}")
+            #     st.info("The 5-Factor model adds RMW and CMA factors to account for profitability and investment patterns.")
 
         # --- Stability Report ---
         st.header("Time Series Split Details (4-Fold Cross-Validation)")
@@ -89,7 +89,11 @@ with st.spinner(f"Running {model_choice} Regression for {ticker}..."):
         if model_choice == "5-Factor":
             fmt.update({'RMW-Beta': '{:.2f}', 'CMA-Beta': '{:.2f}'})
 
-        st.dataframe(stability_df.style.format(fmt), width='stretch')
+        st.dataframe(
+            stability_df.style.format(fmt), 
+            use_container_width=True, 
+            hide_index=True # Removes the 0, 1, 2, 3 column
+        )
 
     else:
         st.error(f"Error: Could not retrieve data for {ticker}. Check the logs or try another ticker.")
