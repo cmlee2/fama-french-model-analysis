@@ -74,4 +74,4 @@ def run_fama_french_analysis(combined_df, model_type = '3-Factor'):
         final_metrics['RMW_Beta'] = final_model.params['RMW']
         final_metrics['CMA_Beta'] = final_model.params['CMA']
 
-    return final_metrics, pd.DataFrame(stability_results), final_model
+    return final_metrics, pd.DataFrame(stability_results)

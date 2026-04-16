@@ -85,14 +85,11 @@ with st.spinner(f"Running {model_choice} Regression for {ticker}..."):
         st.header("Time Series Split Details (4-Fold Cross-Validation)")
         st.info("I split the last 5 years into 4 chronological blocks to see if the stock's coefficients stays the same over time.")
         
-        display_df = stability_df.copy()
-        st.dataframe(display_df.style.format({
-            'Alpha': '{:.4f}',
-            'Alpha_P': '{:.4f}',
-            'In_Sample_R2': '{:.2%}',
-            'Out_Sample_R2': '{:.2%}',
-            'RMSE': '{:.4f}'
-        }), use_container_width=True)
+        fmt = {'Alpha': '{:.4f}', 'Mkt-Beta': '{:.2f}', 'SMB-Beta': '{:.2f}', 'HML-Beta': '{:.2f}', 'Out_R2': '{:.2%}'}
+        if model_choice == "5-Factor":
+            fmt.update({'RMW-Beta': '{:.2f}', 'CMA-Beta': '{:.2f}'})
+
+        st.dataframe(stability_df.style.format(fmt), width='stretch')
 
     else:
         st.error(f"Error: Could not retrieve data for {ticker}. Check the logs or try another ticker.")
