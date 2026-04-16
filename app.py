@@ -36,7 +36,7 @@ with st.spinner(f"Analyzing {ticker}..."):
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=df['Date'], y=df['Stock_Cum'], name=ticker, line=dict(color='#00CC96')))
         fig.add_trace(go.Scatter(x=df['Date'], y=df['Mkt_Cum'], name="Market (S&P 500)", line=dict(color='#636EFA')))
-        st.plotly_chart(fig, use_container_view=True)
+        st.plotly_chart(fig, use_container_width=True)
 
         # --- Coefficients & Explanations ---
         st.header("🧬 Factor Identity (The DNA)")
@@ -67,7 +67,7 @@ with st.spinner(f"Analyzing {ticker}..."):
             'In_Sample_R2': '{:.2%}',
             'Out_Sample_R2': '{:.2%}',
             'RMSE': '{:.4f}'
-        }), use_container_view=True)
+        }), use_container_width=True)
 
     else:
         st.error("Unable to load data. Please check the ticker symbol.")
