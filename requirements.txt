@@ -3,6 +3,7 @@ streamlit>=1.55.0
 yfinance>=0.2.50
 pandas-datareader==0.10.0
 pandas==1.5.3
+numpy==1.26.4
 statsmodels
-scikit-learn>=1.8.0
+scikit-learn
 plotly
